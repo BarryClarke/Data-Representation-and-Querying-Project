@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Homepage -->
+		<title>Sales</title>
+	
+		<!-- Include the jQuery library-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	
+		<!-- Include Bootstrap-->
+		<link rel="stylesheet"
+		href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+		crossorigin="anonymous">
+		
+		<!-- CSS Code -->
+		<style type="text/CSS">	
+			/* quote div positioned and styled */
+			.quote{
+				float: left;
+				width: 95%;
+				height: 100px;
+				padding: 20px;
+				margin: 0px 20px 0px 0px;
+				color: #f40b03;
+				text-align: justify;}
+			
+			/* intro contains the main body text of the page. Positioned beneath quote using clear */
+			.display{
+				clear: left;
+				width: 95%;
+				padding: 10px 20px;
+				font-family: Arial;
+				text-align: justify;}
+	
+			h3, ul, p{
+				font-family: Calibri;
+				font-size: 150%;}
+			
+						
+		</style>
+		</head>
+		<body>
+			<!-- Page header and links to all sub pages -->
+			<img src="Images/Logo.PNG" alt="Logo" Width="50%"><br/>
+			<a href="index.html"><img src="Buttons/homeButton.jpg" alt="Homepage" Width="24%"></a>
+			<a href="sales.html"><img src="Buttons/salesButton.jpg" alt="Sales" Width="24%"></a>
+			<a href="admin.html"><img src="Buttons/adminButton.jpg" alt="Administration" Width="24%"></a>
+			<a href="contact.html"><img src="Buttons/contactButton.jpg" alt="Contact" Width="24%"></a>
+			<hr/>
+
+			
+
+			<div class="create-edit" id="update", style="display:none">
+				<h2>Update Car</h2>
+				<table id="updateForm">
+					<tr>
+						<td>kind</td>
+						<td><input type="text" id="kind" name="kind"></td>
+						<!--<select name="kind">
+							<option value="New">New</option>
+							<option value="Used">Used</option>
+						</select>-->
+					</tr>
+					<tr>
+						<td>ChassisID</td>
+						<td><input type="text" id="chassisID" name="chassisID" id="idInput"></td>
+					</tr>
+					<tr>
+						<td>Make</td>
+						<td><input type="text" id="make" name="manu_code"></td>
+					</tr>
+					<tr>
+						<td>Model</td>
+						<td><input type="text" id="model" name="manu_model"></td>
+					</tr>
+					<tr>
+						<td>Year</td>
+						<td><input type=int id="year" name="year"></td>
+					</tr>
+					<tr>
+						<td>Mileage</td>
+						<td><input type=int id="mileage"  name="mileage"></td>
+					</tr>
+					<tr>
+						<td>Price</td>
+						<td><input type=int id="price" name="price"></td>
+					</tr>
+					<tr>
+						<td>Colour</td>
+						<td><input type="text" id="colour" name="colour"></td>
+					</tr>
+					<tr>
+						<td>Fuel</td>
+						<td><input type="text" id="fuel" name="fuel"></td>
+					</tr>
+					<tr>
+						<td>Supplier Name</td>
+						<td><input type=int id="name" name="name"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<button id="create-car" onclick="doUpdate()">Update</button>
+							<button id="cancel" onclick="cancel()">Cancel</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+	
+			<!-- Create a div to edit and position the quote using CSS contained in Head -->
+			<div class="quote" id="quote">
+				<h3><i>"Welcome to MotorCity Sales page. This page is used to Update a car record"</i></h3>
+			</div>
+		
+			<!-- Create a div to position intro using using clear in CSS contained in Head -->
+			<div class="display" id="display">
+				<table class="table" id="carTable">
+					<tr>
+						<th>Chassis ID</th><th>New/Used</th><th>Make</th><th>Model</th><th>Year</th><th>Mileage</th><th>Fuel</th><th>Colour</th><th>Price</th><th>Supplier</th><th>Location</th><th>Phone</th>
+					</tr>
+				   </table>
+			</div>
+	
+			<script>
+
+				function showUpdateCar(thisElem){
+					var rowElement = thisElem.parentNode.parentNode;
+					car = readCarFromRow(rowElement)
+					console.log(car)
+                	populateForm(car)
+
+					document.getElementById("update").style.display = "block"
+					document.getElementById("quote").style.display = "none"
+					document.getElementById("display").style.display = "none"
+				}
+
+				function readCarFromRow(rowElement){
+					car = {}
+					car.chassisID = rowElement.getAttribute("id");
+					car.chassisID = rowElement.cells[0].firstChild.textContent
+                	car.kind = rowElement.cells[1].firstChild.textContent
+					car.manu_code = rowElement.cells[2].firstChild.textContent
+					car.manu_model = rowElement.cells[3].firstChild.textContent
+					car.year = rowElement.cells[4].firstChild.textContent
+					car.mileage = rowElement.cells[5].firstChild.textContent
+					car.fuel = rowElement.cells[6].firstChild.textContent
+					car.colour = rowElement.cells[7].firstChild.textContent
+					car.price = rowElement.cells[8].firstChild.textContent
+					car.name = rowElement.cells[9].firstChild.textContent
+					return car
+				}
+
+				
+				function doUpdate(){
+					car = getCarFromForm()
+					console.log(car.chassisID)
+				
+					$.ajax({
+						"url":"http://127.0.0.1:5000/cars/"+car.chassisID,
+						"data":JSON.stringify(car),
+						"method":"PUT",
+						"dataType":"JSON",
+						"contentType": "application/json; charset=utf-8",
+						"success":function(result){
+							console.log(result)
+							//findCarDetails(chassisID)
+							updateTableRow(car) // Call this function to get car details across both cars and suppliers tables
+							showDisplay()
+						},
+						error:function(xhr,status,error){
+							console.log("error"+error)
+						}
+					});
+				}
+
+				// Function to use inner join to collect newly enetered car details, including supplier details from supplier table
+				function findCarDetails(chassisID){
+					console.log("Point1")
+					$.ajax({
+            			"url": "http://127.0.0.1:5000/cars/chassis/"+chassisID, //This url is used to call a specific function in the restfull API
+            			"method": "GET",
+            			"data": "",
+            			"dataType": "JSON",
+            			"success":function(result){
+							console.log(result)
+							addCarToTable(result) // Call a function to add car to the table
+							//showDisplay()
+							//clearCreateForm()
+            			},
+            			"error":function(xhr, status, error){
+                			console.log("error:"+status+" msg: "+error)
+            			}
+        			});
+				}
+
+				// Function to read in the data provided by the user in the create car form
+				function getCarFromForm(){
+					var form = document.getElementById('updateForm')
+					var car ={}
+				
+					car.kind = form.querySelector('input[name="kind"]').value
+					car.chassisID = form.querySelector('input[name="chassisID"]').value
+					car.manu_code = form.querySelector('input[name="manu_code"]').value
+					car.manu_model = form.querySelector('input[name="manu_model"]').value
+					car.year = form.querySelector('input[name="year"]').value
+					car.mileage = form.querySelector('input[name="mileage"]').value
+					car.price = form.querySelector('input[name="price"]').value
+					car.colour = form.querySelector('input[name="colour"]').value
+					car.fuel = form.querySelector('input[name="fuel"]').value
+					car.name = form.querySelector('input[name="name"]').value
+					return car
+				}
+
+				function updateTableRow(car){
+                	rowElement = document.getElementById(car.chassisID)
+               		rowElement.cells[1].firstChild.textContent = car.kind
+                	rowElement.cells[2].firstChild.textContent = car.manu_code
+					rowElement.cells[3].firstChild.textContent = car.manu_model
+					rowElement.cells[4].firstChild.textContent = car.year
+					rowElement.cells[5].firstChild.textContent = car.mileage
+					rowElement.cells[6].firstChild.textContent = car.fuel
+					rowElement.cells[7].firstChild.textContent = car.colour
+					rowElement.cells[8].firstChild.textContent = car.price
+					rowElement.cells[9].firstChild.textContent = car.name
+                	//console.log("updating table")
+				}
+				
+				// Function to hide the create form and reveal the display
+			function showDisplay(){
+				document.getElementById('display').style.display = "block"
+				document.getElementById('update').style.display = "none"
+				document.getElementById("quote").style.display = "block"
+				}
+			
+				function cancel(){
+					document.getElementById("update").style.display = "none"
+					document.getElementById("quote").style.display = "block"
+					document.getElementById("display").style.display = "block"
+				}
+
+				
+				// Function that uses AJAX to call to the restful API (restserver.py) and complete method/function
+				function getAll(){
+					$.ajax({
+						"url": "http://127.0.0.1:5000/cars",
+						"method": "GET",
+						"data": "",
+						"dataType": "JSON",
+						"success":function(results){
+							console.log(results)
+							for (car of results)
+								addCarToTable(car) // Call a function to add car to the table
+						},
+						"error":function(xhr, status, error){
+							console.log("error:"+status+" msg: "+error)
+						}
+					});
+				}
+
+				function populateForm(car){
+                	var form = document.getElementById('updateForm')
+
+					form.querySelector('input[name="kind"]').value = car.kind
+                	form.querySelector('input[name="chassisID"]').value = car.chassisID
+					form.querySelector('input[name="chassisID"]').disabled=true
+					form.querySelector('input[name="kind"]').disabled=true
+					form.querySelector('input[name="manu_code"]').value = car.manu_code
+					form.querySelector('input[name="manu_code"]').disabled=true
+					form.querySelector('input[name="manu_model"]').value = car.manu_model
+					form.querySelector('input[name="manu_model"]').disabled=true
+					form.querySelector('input[name="year"]').value = car.year
+					form.querySelector('input[name="year"]').disabled=true
+					form.querySelector('input[name="mileage"]').value = car.mileage
+					form.querySelector('input[name="fuel"]').value = car.fuel
+					form.querySelector('input[name="fuel"]').disabled=true
+					form.querySelector('input[name="colour"]').value = car.colour
+					form.querySelector('input[name="colour"]').disabled=true
+					form.querySelector('input[name="price"]').value = car.price
+					form.querySelector('input[name="name"]').value = car.name
+					form.querySelector('input[name="name"]').disabled=true      
+				}
+
+
+	
+				// Function to add new car to the table
+				function addCarToTable(car){
+					
+					tableElement = document.getElementById('carTable') 
+					rowElement = tableElement.insertRow(-1)
+	
+					rowElement.setAttribute("id", car.chassisID)
+					cell1 = rowElement.insertCell(0) 
+					cell1.innerHTML = car.chassisID
+					cell2 = rowElement.insertCell(1) 
+					cell2.innerHTML = car.kind
+					cell3 = rowElement.insertCell(2) 
+					cell3.innerHTML = car.manu_code 
+					cell4 = rowElement.insertCell(3) 
+					cell4.innerHTML = car.manu_model 
+					cell5 = rowElement.insertCell(4)
+					cell5.innerHTML = car.year
+					cell6 = rowElement.insertCell(5) 
+					cell6.innerHTML = car.mileage 
+					cell7 = rowElement.insertCell(6) 
+					cell7.innerHTML = car.fuel 
+					cell8 = rowElement.insertCell(7) 
+					cell8.innerHTML = car.colour
+					cell9 = rowElement.insertCell(8) 
+					cell9.innerHTML = car.price
+					cell10 = rowElement.insertCell(9)
+					cell10.innerHTML = car.name
+					cell11 = rowElement.insertCell(10)
+					cell11.innerHTML = car.location
+					cell12 = rowElement.insertCell(11)
+					cell12.innerHTML = car.phone 
+					cell13 = rowElement.insertCell(12)
+					cell13.innerHTML = '<button onClick="showUpdateCar(this)">Update</button>'
+				}
+	
+				getAll()
+			</script>
+		</body>
+	</html>

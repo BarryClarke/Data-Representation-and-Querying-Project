@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<!-- Homepage -->
+	<title>Home</title>
+
+	<!-- Include the jQuery library-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	<!-- Include Bootstrap-->
+	<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+	
+	<!-- CSS Code -->
+	<style type="text/CSS">	
+		/* quote div positioned and styled */
+		.quote{
+			float: left;
+			width: 75%;
+			height: 200px;
+			padding: 20px;
+			margin: 0px 20px 0px 0px;
+            /*background-color: black;*/
+			color: #f40b03;
+			text-align: justify;}
+
+        
+        .login{
+			float: left;
+			width: 16%;
+			height: 220px;}
+		
+					
+	</style>
+	</head>
+	<body>
+		<!-- Page header and links to all sub pages -->
+    	<img src="Images/Logo.PNG" alt="Logo" Width="50%"><br/>
+		<a href="index.html"><img src="Buttons/homeButton.jpg" alt="Homepage" Width="24%"></a>
+		<!-- Onclick below demonstrates use of events -->
+		<a href="sales.html"><img src="Buttons/salesButton.jpg" alt="Sales" Width="24%"></a>
+		<a href="sales.html"><img src="Buttons/adminButton.jpg" alt="Administration" Width="24%"></a>
+		<a href="contact.html"><img src="Buttons/contactButton.jpg" alt="Contact" Width="24%"></a>
+		<hr/>
+
+		<!-- Create a div to edit and position the quote using CSS contained in Head -->
+		<div class="quote">
+			<h3><i>"Please provide the Username and password to access"</i></h3>
+		</div>
+
+        <!-- Create a div to position teamPic using using float in CSS contained in Head -->
+	<div class="login">
+		<form form method='post' action='https://127.0.0.1:5000/sales.html'>
+			<fieldset style="width: 180px">
+				<legend>LOGIN</legend>
+			
+				<p>Username:
+				</br><input id="uname" name='uname' type=text/>
+				</p>
+				<p>Password:
+				</br><input id="pwd" name='pass' type="password"/>
+				</p>
+				<p><button type="button" onclick="validate()">LOGIN</button></p> <!-- Onclick demonstrates use of an event -->
+			</fieldset>
+		</form>			
+	</div>
+        
+        
+	</body>
+</html>

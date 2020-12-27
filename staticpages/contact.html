@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<!-- Homepage -->
+	<title>Home</title>
+
+	<!-- Include the jQuery library-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	<!-- Include Bootstrap-->
+	<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+	
+	<!-- CSS Code -->
+	<style type="text/CSS">	
+		.quote{
+			float: left;
+			width: 95%;
+			height: 50px;
+			padding: 20px;
+			margin: 0px 20px 0px 0px;
+			color: #f40b03;
+			text-align: justify;}
+	 
+		.opt{
+			float: left;
+			clear: left;
+			padding: 20px;}
+		
+		.create-button{
+			float: left;
+		}
+
+		.update-button{
+			float: left;
+		}
+
+		.cancel-button{
+			float: left;
+			margin-left :5px;
+		}
+		
+		/* intro contains the main body text of the page. Positioned beneath quote using clear */
+		.display{
+			clear: left;
+			width: 95%;
+			padding: 10px 20px;
+			font-family: Arial;
+			text-align: justify;}
+
+		h3, ul, p{
+			font-family: Calibri;
+			font-size: 150%;}
+		
+					
+	</style>
+	</head>
+	<body>
+		<!-- Page header and links to all sub pages -->
+    	<img src="Images/Logo.PNG" alt="Logo" Width="50%"><br/>
+		<a href="index.html"><img src="Buttons/homeButton.jpg" alt="Homepage" Width="24%"></a>
+		<a href="sales.html"><img src="Buttons/salesButton.jpg" alt="Administration" Width="24%"></a>
+		<a href="admin.html"><img src="Buttons/adminButton.jpg" alt="Administration" Width="24%"></a>
+		<a href="contact.html"><img src="Buttons/contactButton.jpg" alt="Contact" Width="24%"></a>
+		<hr/>
+
+		<!--Create Form used to enter details of a new supplier. Hidden at first-->
+		<div class="create-edit" id="create-update", style="display:none">
+			<h2>Create/Update Supplier</h2>
+			<table id="createForm">
+				<tr>
+					<td>Supplier ID</td>
+					<td><input type="text" id="SID" name="SID"></td>
+				</tr>
+				<tr>
+					<td>Name</td>
+					<td><input type="text" id="name" name="name"></td>
+				</tr>
+				<tr>
+					<td>Location</td>
+					<td><input type="text" id="location" name="location"></td>
+				</tr>
+				<tr>
+					<td>Phone</td>
+					<td><input type="text" id="phone" name="phone"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<button class="create-button" id="create-button" onclick="doCreate()">Create</button>
+						<button class="update-button" id="update-button" onclick="doUpdate()">Update</button>
+						<button class="cancel-button" id="cancel" onclick="cancel()">Cancel</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<!--Seperate divs to allow for poitioning on the page -->
+		<div class="quote", id="quote">
+			<h3><i>Welcome to the contacts page. This page is used to view, create or delete suppliers from the suppliers table</i></h3>
+		</div>
+		
+		<div class="opt", id="opt">
+			<button onclick="showCreateSupplier()">Create Supplier</button>
+		</div>
+
+		<div class="display", id="display">
+			<table class="table" id="supplierTable">
+            	<tr>
+                	<th>SupplierID</th><th>Supplier</th><th>Location</th><th>Phone</th>
+            	</tr>
+			   </table>
+		</div>
+
+		<script>
+
+			//Function to hide the display and reveal the form for creating a supplier
+			function showCreateSupplier(){
+				document.getElementById("create-update").style.display = "block"
+				document.getElementById("quote").style.display = "none"
+				document.getElementById("opt").style.display = "none"
+				document.getElementById("update-button").style.display = "none"
+				document.getElementById("create-button").style.display = "block"
+				document.getElementById("display").style.display = "none"
+				populateCreateForm()
+			}
+
+			// Function to reveal display page when cancel button is used
+			function cancel(){
+				document.getElementById("create-update").style.display = "none"
+				document.getElementById("update-button").style.display = "none"
+				document.getElementById("create-button").style.display = "none"
+				document.getElementById("quote").style.display = "block"
+				document.getElementById("opt").style.display = "block"
+				document.getElementById("display").style.display = "block"
+			}
+
+			// Function to hide the create form and reveal the display
+			function showDisplay(){
+				document.getElementById('display').style.display = "block"
+				document.getElementById("create-update").style.display = "none"
+				document.getElementById("update-button").style.display = "none"
+				document.getElementById("create-button").style.display = "none"
+				document.getElementById("quote").style.display = "block"
+				document.getElementById("opt").style.display = "block"
+			}
+
+
+			// Function to use the data from the form to create a new entry in the suppliers table
+			function doCreate(){
+				supplier = getSupplierFromForm()
+				$.ajax({
+					"url":"http://127.0.0.1:5000/suppliers",
+					"data":JSON.stringify(supplier),
+					"method":"POST",
+					"dataType":"JSON",
+					"contentType": "application/json; charset=utf-8",
+					"success":function(result){
+						console.log(result)
+						findSupplierDetails(result) // Call this function to get all supplier details, including supplierID	
+					},
+					error:function(xhr,status,error){
+						console.log("error"+error)
+					}
+				});
+			}
+
+			// Function to get all supplier details from suppliers table
+			function findSupplierDetails(supplierID){
+				$.ajax({
+            		"url": "http://127.0.0.1:5000/suppliers/"+supplierID,
+            		"method": "GET",
+            		"data": "",
+            		"dataType": "JSON",
+            		"success":function(result){
+						console.log(result)
+						addSupplierToTable(result) // Call a function to add car to the table
+						showDisplay()
+            		},
+            		"error":function(xhr, status, error){
+                		console.log("error:"+status+" msg: "+error)
+            		}
+        		});
+			}
+
+			function populateCreateForm(){
+                	var form = document.getElementById('createForm')
+					console.log(supplier)
+					form.querySelector('input[name="SID"]').value = ''
+					form.querySelector('input[name="SID"]').disabled=true
+					form.querySelector('input[name="name"]').value = ''
+                	form.querySelector('input[name="location"]').value = ''
+					form.querySelector('input[name="phone"]').value = ''  
+			}
+
+			function showUpdateSupplier(thisElem){
+					var rowElement = thisElem.parentNode.parentNode;
+					supplier = readSupplierFromRow(rowElement)
+					console.log(supplier)
+                	populateForm(supplier)
+
+					document.getElementById("create-update").style.display = "block"
+					document.getElementById("update-button").style.display = "block"
+					document.getElementById("create-button").style.display = "none"
+					document.getElementById("quote").style.display = "none"
+					document.getElementById("display").style.display = "none"
+					document.getElementById("opt").style.display = "none"
+			}
+
+			function readSupplierFromRow(rowElement){
+					supplier = {}
+					supplier.supplierID = rowElement.getAttribute("id");
+					supplier.supplierID = rowElement.cells[0].firstChild.textContent
+					supplier.name = rowElement.cells[1].firstChild.textContent
+					supplier.location = rowElement.cells[2].firstChild.textContent
+					supplier.phone = rowElement.cells[3].firstChild.textContent
+					return supplier
+			}
+
+			function populateForm(supplier){
+                	var form = document.getElementById('createForm')
+					console.log(supplier)
+					form.querySelector('input[name="SID"]').value = supplier.supplierID
+					form.querySelector('input[name="SID"]').disabled=true
+					form.querySelector('input[name="name"]').value = supplier.name
+                	form.querySelector('input[name="location"]').value = supplier.location
+					form.querySelector('input[name="phone"]').value = supplier.phone   
+			}
+
+			function doUpdate(){
+					supplier = getSupplierFromForm()
+					console.log(supplier.supplierID)
+				
+					$.ajax({
+						"url":"http://127.0.0.1:5000/suppliers/"+supplier.supplierID,
+						"data":JSON.stringify(supplier),
+						"method":"PUT",
+						"dataType":"JSON",
+						"contentType": "application/json; charset=utf-8",
+						"success":function(result){
+							console.log(result)
+							updateTableRow(supplier) // Call this function to get car details across both cars and suppliers tables
+							showDisplay()
+						},
+						error:function(xhr,status,error){
+							console.log("error"+error)
+						}
+					});
+				}
+			
+				function updateTableRow(supplier){
+                	rowElement = document.getElementById(supplier.supplierID)
+               		rowElement.cells[1].firstChild.textContent = supplier.name
+                	rowElement.cells[2].firstChild.textContent = supplier.location
+					rowElement.cells[3].firstChild.textContent = supplier.phone
+                	//console.log("updating table")
+				}
+
+			// Function to delete a supplier from the suppliers table
+			function doDelete(thisElem){
+				var x = confirm('Warning: Deleting data here will affect data in the cars page')
+				if (x == true){
+					var tableElement = document.getElementById('supplierTable')
+					var rowElement = thisElem.parentNode.parentNode
+					supplierID = rowElement.getAttribute("id")
+					var index = rowElement.rowIndex
+
+					$.ajax({
+                		"url": "http://127.0.0.1:5000/suppliers/"+supplierID,
+                		"method": "DELETE",
+                		"data": JSON.stringify(supplier),
+                		"dataType": "JSON",
+                		contentType: "application/json; charset=utf-8",
+                		"success":function(result){
+							console.log(result)
+							tableElement.deleteRow(index)
+                		},
+                		"error":function(xhr, status, error){
+                    		console.log("error:"+status+" msg: "+error)
+                		}
+            		});			
+				}
+				else{
+				}	
+			}
+
+			// Function to read in the data provided by the user in the create supplier form
+			function getSupplierFromForm(){
+				var form = document.getElementById('createForm')
+				var supplier ={}
+				
+				supplier.supplierID = form.querySelector('input[name="SID"]').value
+				supplier.name = form.querySelector('input[name="name"]').value
+				supplier.location = form.querySelector('input[name="location"]').value
+				supplier.phone = form.querySelector('input[name="phone"]').value
+				console.log(supplier)
+				return supplier
+			}
+			
+			// Function to get all suppliers from the suppliers table
+    		function getAll(){
+        		$.ajax({
+            		"url": "http://127.0.0.1:5000/suppliers", 
+            		"method": "GET",
+            		"data": "",
+            		"dataType": "JSON",
+            		"success":function(results){
+						console.log(results)
+						for (supplier of results)
+                    		addSupplierToTable(supplier) // Call a function to add supplier to the table
+            		},
+            		"error":function(xhr, status, error){
+                		console.log("error:"+status+" msg: "+error)
+            		}
+        		});
+    		}
+
+    		// Function to add suppliers to the table
+    		function addSupplierToTable(supplier){
+				
+        		var tableElement = document.getElementById('supplierTable')
+        		var rowElement = tableElement.insertRow(-1)
+
+				rowElement.setAttribute("id", supplier.supplierID)
+        		var cell1 = rowElement.insertCell(0)
+				cell1.innerHTML = supplier.supplierID
+        		var cell2 = rowElement.insertCell(1)
+        		cell2.innerHTML = supplier.name
+        		var cell3 = rowElement.insertCell(2)
+        		cell3.innerHTML = supplier.location
+        		var cell4 = rowElement.insertCell(3) 
+				cell4.innerHTML = supplier.phone
+				cell5 = rowElement.insertCell(4)
+				cell5.innerHTML = '<button onClick="showUpdateSupplier(this)">Update</button>'
+				cell6 = rowElement.insertCell(5)
+				cell6.innerHTML = '<button onclick="doDelete(this)">Delete</button>' 	
+    		}
+
+			getAll()
+
+		</script>
+	</body>
+</html>
