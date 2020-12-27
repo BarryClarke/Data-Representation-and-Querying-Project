@@ -3,7 +3,7 @@
 ![MotorCity](/staticpages/Images/Logo.PNG)
 ## Scope
 To create an App Server that connects to a database and allows for CRUD opreations to be completed on the database. This app server should have a web interface to allow for user control.
-[See here for instructions](/Project_Description/project.pdf)
+[See here for instructions](/project_description/Project_Description.pdf)
 
 ## Setup and run the project
 1. Contained in the main folder are the SQL initialisation files for the "vehicles" database used in this project
